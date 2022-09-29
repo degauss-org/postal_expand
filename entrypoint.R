@@ -12,6 +12,7 @@ opt <- docopt::docopt(doc)
 ## for interactive testing
 ## opt <- docopt::docopt(doc, args = "address.csv")
 ## opt <- docopt::docopt(doc, args = c("address.csv", "expand"))
+## opt <- docopt::docopt(doc, args = c("address_stub.csv", "expand"))
 
 d_in <- readr::read_csv(opt$filename, show_col_types = FALSE)
 cli::cli_alert_success("imported data from {opt$filename}")
@@ -42,20 +43,7 @@ parsed_address_components <-
 
 d <- dplyr::bind_cols(d, parsed_address_components)
 
-collapse <- function(x) {
-  paste(na.omit(x), collapse = " ")
-}
-
-d <- d |>
-  dplyr::rowwise(input_address) |>
-  dplyr::mutate(parsed_address = collapse(c(
-    parsed.house_number,
-    parsed.road,
-    parsed.city,
-    parsed.state,
-    parsed.postcode
-  ))) |>
-  dplyr::ungroup()
+d <- tidyr::unite(d, col = "parsed_address", starts_with("parsed."), sep = " ", na.rm = TRUE, remove = FALSE)
 
 ## expanding addresses
 if (!is.null(opt$expand)) {
@@ -71,6 +59,5 @@ if (!is.null(opt$expand)) {
 }
 
 d_out <- dplyr::left_join(d_in, d, by = c("address" = "input_address"))
-
 
 dht::write_geomarker_file(d_out, filename = opt$filename, argument = opt$expand)
