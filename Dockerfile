@@ -1,10 +1,9 @@
 FROM rocker/r-ver:4.1.3
 
 # DeGAUSS container metadata
-ENV degauss_name="postal"
-ENV degauss_version="0.1.4"
-ENV degauss_description="normalized and parsed addresses"
-ENV degauss_argument="expand [default: '']"
+ENV degauss_name="postal_expand"
+ENV degauss_version="0.1.0"
+ENV degauss_description="normalized addresses"
 
 # add OCI labels based on environment variables too
 LABEL "org.degauss.name"="${degauss_name}"
